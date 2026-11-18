@@ -52,6 +52,9 @@ def deploy(source: str, dest: str) -> None:
                 f"copy was truncated: wrote {staged} bytes of {expected} "
                 f"from {source!r}"
             )
+        # mkstemp() creates the staged file 0600 and rename keeps that mode;
+        # make the deployed image world-readable like a plain file copy would.
+        os.chmod(tmp_path, 0o644)
         os.replace(tmp_path, dest)
     except BaseException:
         try:
